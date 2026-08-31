@@ -2,7 +2,10 @@ package application.valueObjects;
 
 public enum UserRole {
 
-   ADMIN,
-   USER
-    
+    BUYER,
+    SELLER,
+    LOGISTICS_OPERATOR,
+    ADMINISTRATOR,
+    SUPERVISOR
+
 }

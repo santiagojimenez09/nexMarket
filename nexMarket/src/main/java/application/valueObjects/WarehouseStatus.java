@@ -1,9 +1,8 @@
 package application.valueObjects;
 
-public enum UserStatus {
+public enum WarehouseStatus {
 
     ACTIVE,
-    INACTIVE,
-    BLOCKED
+    INACTIVE
 
 }

@@ -1,9 +1,9 @@
 package application.valueObjects;
 
-public enum UserStatus {
+public enum BuyerCommercialStatus {
 
     ACTIVE,
-    INACTIVE,
+    RESTRICTED,
     BLOCKED
 
 }
