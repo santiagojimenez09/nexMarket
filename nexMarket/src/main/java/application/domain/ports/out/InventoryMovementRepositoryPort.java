@@ -1,4 +1,4 @@
-﻿package application.domain.ports.out;
+package application.domain.ports.out;
 
 import application.domain.models.Inventory;
 import application.domain.models.InventoryMovement;

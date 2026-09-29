@@ -1,4 +1,4 @@
-﻿package application.domain.services.logistics;
+package application.domain.services.logistics;
 
 import application.domain.models.LogisticsOperator;
 import application.domain.models.Order;

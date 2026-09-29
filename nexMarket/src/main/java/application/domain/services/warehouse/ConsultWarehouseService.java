@@ -1,4 +1,4 @@
-﻿package application.domain.services.warehouse;
+package application.domain.services.warehouse;
 
 import application.domain.models.Seller;
 import application.domain.models.Warehouse;

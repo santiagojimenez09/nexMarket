@@ -1,4 +1,4 @@
-﻿package application.domain.ports.in;
+package application.domain.ports.in;
 
 import application.domain.models.Administrator;
 import application.domain.models.Seller;

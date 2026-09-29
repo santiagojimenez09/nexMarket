@@ -1,4 +1,4 @@
-﻿package application.domain.services.invoicing;
+package application.domain.services.invoicing;
 
 import application.domain.models.Invoice;
 import application.domain.models.Order;

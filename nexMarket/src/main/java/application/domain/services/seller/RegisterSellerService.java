@@ -1,4 +1,4 @@
-﻿package application.domain.services.seller;
+package application.domain.services.seller;
 
 import application.domain.models.Administrator;
 import application.domain.models.Seller;

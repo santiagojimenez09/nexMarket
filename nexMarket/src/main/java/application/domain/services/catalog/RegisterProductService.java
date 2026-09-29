@@ -1,4 +1,4 @@
-﻿package application.domain.services.catalog;
+package application.domain.services.catalog;
 
 import application.domain.models.DigitalProduct;
 import application.domain.models.PhysicalProduct;

@@ -46,142 +46,160 @@ Each component has a clearly defined responsibility.
 
 # Package Structure
 
-The package structure below extends what already exists in the repository (`application/domains` and `application/valueObjects`) with the additional layers required by Hexagonal Architecture.
+The package structure aligns with the course reference repository (`andfsanchezag/construccion_de_software_2_2026_2`), adhering strictly to **Domain-Driven Design (DDD)** and **Hexagonal Architecture (Ports and Adapters)**:
 
 ```text
-src/
-└── main/
-    └── java/
-        └── application/
-            │
-            ├── NexMarketApplication.java
-            │
-            ├── domains/
-            │   ├── User.java
-            │   ├── Buyer.java
-            │   ├── Seller.java
-            │   ├── LogisticsOperator.java
-            │   ├── Administrator.java
-            │   ├── Supervisor.java
-            │   ├── Warehouse.java
-            │   ├── Product.java
-            │   ├── PhysicalProduct.java
-            │   ├── DigitalProduct.java
-            │   ├── ProductVariant.java
-            │   ├── Inventory.java
-            │   ├── InventoryMovement.java
-            │   ├── ShoppingCart.java
-            │   ├── CartItem.java
-            │   ├── TrackableProcess.java
-            │   ├── Order.java
-            │   ├── OrderItem.java
-            │   ├── Invoice.java
-            │   ├── Shipment.java
-            │   ├── Return.java
-            │   ├── Refund.java
-            │   ├── Operation.java
-            │   └── AuditLog.java
-            │
-            ├── valueObjects/
-            │   ├── UserRole.java
-            │   ├── UserStatus.java
-            │   ├── BuyerCommercialStatus.java
-            │   ├── WarehouseType.java
-            │   ├── WarehouseStatus.java
-            │   ├── ProductType.java
-            │   ├── ProductStatus.java
-            │   ├── InventoryMovementType.java
-            │   ├── InventoryConditionStatus.java
-            │   ├── OrderStatus.java
-            │   ├── ShipmentStatus.java
-            │   ├── ReturnStatus.java
-            │   ├── RefundStatus.java
-            │   ├── OperationType.java
-            │   ├── ApprovalDecision.java
-            │   ├── NotificationChannel.java
-            │   └── AuditSeverity.java
-            │
-            ├── exceptions/
-            │   ├── DomainException.java
-            │   ├── EntityNotFoundException.java
-            │   ├── InsufficientStockException.java
-            │   ├── InvalidOrderStatusException.java
-            │   ├── InvalidStatusTransitionException.java
-            │   ├── UnauthorizedOperationException.java
-            │   └── UserNotEligibleException.java
-            │
-            ├── services/
-            │   ├── user/
-            │   ├── seller/
-            │   ├── buyer/
-            │   ├── warehouse/
-            │   ├── catalog/
-            │   ├── inventory/
-            │   ├── cart/
-            │   ├── order/
-            │   ├── invoicing/
-            │   ├── logistics/
-            │   ├── returns/
-            │   ├── operation/
-            │   └── authorization/
-            │
-            ├── ports/
-            │   ├── in/
-            │   │   ├── RegisterSellerUseCase.java
-            │   │   ├── ConfirmOrderUseCase.java
-            │   │   ├── DispatchOrderUseCase.java
-            │   │   ├── RequestReturnUseCase.java
-            │   │   ├── ProcessRefundUseCase.java
-            │   │   └── ...
-            │   │
-            │   └── out/
-            │       ├── UserRepositoryPort.java
-            │       ├── BuyerRepositoryPort.java
-            │       ├── SellerRepositoryPort.java
-            │       ├── WarehouseRepositoryPort.java
-            │       ├── ProductRepositoryPort.java
-            │       ├── InventoryRepositoryPort.java
-            │       ├── InventoryMovementRepositoryPort.java
-            │       ├── ShoppingCartRepositoryPort.java
-            │       ├── OrderRepositoryPort.java
-            │       ├── InvoiceRepositoryPort.java
-            │       ├── ShipmentRepositoryPort.java
-            │       ├── ReturnRepositoryPort.java
-            │       ├── RefundRepositoryPort.java
-            │       ├── OperationRepositoryPort.java
-            │       ├── AuditLogRepositoryPort.java
-            │       ├── PasswordServicePort.java
-            │       ├── JwtServicePort.java
-            │       ├── NotificationPort.java
-            │       ├── AuthorizationPort.java
-            │       └── BusinessConfigurationPort.java
-            │
-            ├── adapters/
-            │   ├── in/
-            │   │   └── rest/
-            │   │       ├── controllers/
-            │   │       ├── requests/
-            │   │       ├── responses/
-            │   │       └── mappers/
-            │   │
-            │   └── out/
-            │       └── persistence/
-            │           ├── mysql/
-            │           │   ├── entities/
-            │           │   ├── repositories/
-            │           │   ├── mappers/
-            │           │   └── adapters/
-            │           │
-            │           └── mongodb/
-            │               ├── documents/
-            │               ├── repositories/
-            │               ├── mappers/
-            │               └── adapters/
-            │
-            └── infrastructure/
-                ├── config/
-                ├── database/
-                └── security/
+nexMarket/
+└── src/
+    └── main/
+        └── java/
+            └── application/
+                │
+                ├── NexMarketApplication.java
+                │
+                ├── domain/
+                │   ├── models/
+                │   │   ├── User.java
+                │   │   ├── Buyer.java
+                │   │   ├── Seller.java
+                │   │   ├── LogisticsOperator.java
+                │   │   ├── Administrator.java
+                │   │   ├── Supervisor.java
+                │   │   ├── Warehouse.java
+                │   │   ├── Product.java
+                │   │   ├── PhysicalProduct.java
+                │   │   ├── DigitalProduct.java
+                │   │   ├── ProductVariant.java
+                │   │   ├── Inventory.java
+                │   │   ├── InventoryMovement.java
+                │   │   ├── ShoppingCart.java
+                │   │   ├── CartItem.java
+                │   │   ├── TrackableProcess.java
+                │   │   ├── Order.java
+                │   │   ├── OrderItem.java
+                │   │   ├── Invoice.java
+                │   │   ├── Shipment.java
+                │   │   ├── Return.java
+                │   │   ├── Refund.java
+                │   │   ├── Operation.java
+                │   │   └── AuditLog.java
+                │   │
+                │   ├── valueObjects/
+                │   │   ├── UserRole.java
+                │   │   ├── UserStatus.java
+                │   │   ├── BuyerCommercialStatus.java
+                │   │   ├── WarehouseType.java
+                │   │   ├── WarehouseStatus.java
+                │   │   ├── ProductType.java
+                │   │   ├── ProductStatus.java
+                │   │   ├── InventoryMovementType.java
+                │   │   ├── InventoryConditionStatus.java
+                │   │   ├── OrderStatus.java
+                │   │   ├── ShipmentStatus.java
+                │   │   ├── ReturnStatus.java
+                │   │   ├── RefundStatus.java
+                │   │   ├── OperationType.java
+                │   │   ├── ApprovalDecision.java
+                │   │   ├── NotificationChannel.java
+                │   │   └── AuditSeverity.java
+                │   │
+                │   ├── exceptions/
+                │   │   ├── DomainException.java
+                │   │   ├── EntityNotFoundException.java
+                │   │   ├── InsufficientStockException.java
+                │   │   ├── InvalidOrderStatusException.java
+                │   │   ├── InvalidStatusTransitionException.java
+                │   │   ├── UnauthorizedOperationException.java
+                │   │   └── UserNotEligibleException.java
+                │   │
+                │   ├── ports/
+                │   │   ├── in/
+                │   │   │   ├── PublicAccessPort.java
+                │   │   │   ├── BuyerPort.java
+                │   │   │   ├── SellerPort.java
+                │   │   │   ├── LogisticsOperatorPort.java
+                │   │   │   ├── AdministratorPort.java
+                │   │   │   └── SupervisorPort.java
+                │   │   │
+                │   │   └── out/
+                │   │       ├── UserRepositoryPort.java
+                │   │       ├── BuyerRepositoryPort.java
+                │   │       ├── SellerRepositoryPort.java
+                │   │       ├── WarehouseRepositoryPort.java
+                │   │       ├── ProductRepositoryPort.java
+                │   │       ├── InventoryRepositoryPort.java
+                │   │       ├── InventoryMovementRepositoryPort.java
+                │   │       ├── ShoppingCartRepositoryPort.java
+                │   │       ├── OrderRepositoryPort.java
+                │   │       ├── InvoiceRepositoryPort.java
+                │   │       ├── ShipmentRepositoryPort.java
+                │   │       ├── ReturnRepositoryPort.java
+                │   │       ├── RefundRepositoryPort.java
+                │   │       ├── OperationRepositoryPort.java
+                │   │       ├── AuditLogRepositoryPort.java
+                │   │       ├── PasswordServicePort.java
+                │   │       ├── JwtServicePort.java
+                │   │       ├── NotificationPort.java
+                │   │       ├── AuthorizationPort.java
+                │   │       └── BusinessConfigurationPort.java
+                │   │
+                │   └── services/
+                │       ├── user/
+                │       ├── seller/
+                │       ├── buyer/
+                │       ├── warehouse/
+                │       ├── catalog/
+                │       ├── inventory/
+                │       ├── cart/
+                │       ├── order/
+                │       ├── invoicing/
+                │       ├── logistics/
+                │       ├── returns/
+                │       ├── operation/
+                │       └── authorization/
+                │
+                ├── adapters/
+                │   ├── useCases/
+                │   │   ├── PublicAccessUseCaseImpl.java
+                │   │   ├── BuyerUseCaseImpl.java
+                │   │   ├── SellerUseCaseImpl.java
+                │   │   ├── LogisticsOperatorUseCaseImpl.java
+                │   │   ├── AdministratorUseCaseImpl.java
+                │   │   └── SupervisorUseCaseImpl.java
+                │   │
+                │   ├── rest/
+                │   │   ├── controllers/
+                │   │   │   ├── PublicAccessController.java
+                │   │   │   ├── BuyerController.java
+                │   │   │   ├── SellerController.java
+                │   │   │   ├── LogisticsOperatorController.java
+                │   │   │   ├── AdministratorController.java
+                │   │   │   └── SupervisorController.java
+                │   │   ├── dtos/
+                │   │   │   ├── requests/
+                │   │   │   └── responses/
+                │   │   ├── mappers/
+                │   │   └── exception/
+                │   │       ├── GlobalExceptionHandler.java
+                │   │       └── ErrorResponse.java
+                │   │
+                │   └── persistence/
+                │       ├── jpa/
+                │       │   ├── entities/
+                │       │   ├── repositories/
+                │       │   ├── mappers/
+                │       │   └── adapters/
+                │       │
+                │       └── mongodb/
+                │           ├── documents/
+                │           ├── repositories/
+                │           ├── mappers/
+                │           └── adapters/
+                │
+                └── infrastructure/
+                    ├── config/
+                    ├── notification/
+                    └── security/
 ```
 
 ---
@@ -192,7 +210,7 @@ src/
 
 The `application` package represents the root of the project.
 
-It contains the application entry point (`NexMarketApplication.java`, already present in the repository) and all architectural components.
+It contains the application entry point (`NexMarketApplication.java`) and all architectural components.
 
 ### Responsibilities
 
@@ -221,7 +239,7 @@ It contains the application entry point (`NexMarketApplication.java`, already pr
 
 The Domain layer is the core of the application. It contains all business rules described in the Functional Specification and must remain independent from any external technology.
 
-No class inside `domains/`, `valueObjects/`, `services/`, `ports/`, or `exceptions/` may depend on:
+No class inside `domain/models/`, `domain/valueObjects/`, `domain/services/`, `domain/ports/`, or `domain/exceptions/` may depend on:
 
 - Spring
 - JPA
@@ -232,11 +250,11 @@ No class inside `domains/`, `valueObjects/`, `services/`, `ports/`, or `exceptio
 - JSON
 - SQL
 
-This is consistent with the existing `domains/User.java`, which is a plain POJO using only Lombok for boilerplate — no persistence annotations.
+This is consistent with the domain entities, which are plain POJOs using only standard Java (and Lombok for boilerplate reduction) — with zero persistence or framework annotations.
 
 ---
 
-## domains/
+## domain/models/
 
 Contains the business entities described in the `Domain Model.md` document: identity (`User` and its specializations), catalog (`Product`, `Warehouse`, `Inventory`), commercial processes (`ShoppingCart`, `Order`, `Invoice`, `Shipment`, `Return`, `Refund`) and traceability (`Operation`, `AuditLog`).
 
@@ -244,15 +262,15 @@ These objects represent the marketplace business, independent of how they are pe
 
 ---
 
-## valueObjects/
+## domain/valueObjects/
 
-Represent immutable business concepts, currently implemented as plain Java enums (e.g. `UserRole`, `OrderStatus`, `ProductType`), consistent with the existing `UserRole.java` and `UserStatus.java`.
+Represent immutable business concepts, implemented as plain Java enums (e.g. `UserRole`, `OrderStatus`, `ProductType`, `BuyerCommercialStatus`, `WarehouseType`, `WarehouseStatus`).
 
 Value Objects are compared by value instead of identity.
 
 ---
 
-## exceptions/
+## domain/exceptions/
 
 Contains business exceptions raised when a domain rule described in the specification is violated.
 
@@ -266,9 +284,9 @@ Business exceptions belong exclusively to the domain.
 
 ---
 
-## services/
+## domain/services/
 
-Contain the business logic described in `Domain Services.md`, organized by subdomain (`user`, `seller`, `buyer`, `warehouse`, `catalog`, `inventory`, `cart`, `order`, `invoicing`, `logistics`, `returns`, `operation`, `authorization`).
+Contain the business logic described in `Domain Services.md` and `services/*.md`, organized by subdomain (`user`, `seller`, `buyer`, `warehouse`, `catalog`, `inventory`, `cart`, `order`, `invoicing`, `logistics`, `returns`, `operation`, `authorization`).
 
 Examples:
 
@@ -281,25 +299,24 @@ Services coordinate business operations across multiple entities while preservin
 
 ---
 
-## ports/
+## domain/ports/
 
 Ports define communication contracts between the domain and external technologies. The domain owns all interfaces.
 
-### Input Ports (`ports/in/`)
+### Input Ports (`domain/ports/in/`)
 
-Represent application use cases, directly traceable to the service catalog in `Domain Services.md`.
+Organized strictly by **System Role (`UserRole`)**, enforcing granular boundary security and role segregation (`RG-02`, `RG-03`):
 
-Examples:
-
-- `RegisterSellerUseCase`
-- `ConfirmOrderUseCase`
-- `DispatchOrderUseCase`
-- `RequestReturnUseCase`
-- `ProcessRefundUseCase`
+- `PublicAccessPort` — unauthenticated operations (login, registration, public catalog).
+- `BuyerPort` — operations for registered buyers (cart, checkout, order tracking, returns).
+- `SellerPort` — operations for sellers (catalog management, product lifecycle, seller inventory).
+- `LogisticsOperatorPort` — warehouse operations, stock adjustments, dispatching, and delivery confirmation.
+- `AdministratorPort` — seller/warehouse approval, user management, refund approvals.
+- `SupervisorPort` — operational audit consulting, traceability, and administrative metrics.
 
 Input ports define what the system can do.
 
-### Output Ports (`ports/out/`)
+### Output Ports (`domain/ports/out/`)
 
 Represent dependencies required by the domain, as defined in `Output-ports.md`.
 
@@ -309,6 +326,7 @@ Examples:
 - `InventoryRepositoryPort`
 - `AuditLogRepositoryPort`
 - `NotificationPort`
+- `AuthorizationPort`
 
 Output ports define what the domain needs from external systems.
 
@@ -320,40 +338,54 @@ The adapters connect external technologies with the business domain. Adapters tr
 
 ---
 
-## Input Adapters (`adapters/in/rest/`)
+## Use Case Adapters (`adapters/useCases/`)
 
-Expose the application to external clients (buyers, sellers, administrators, logistics operators, and supervisors interacting through client applications).
+Implement the Role Input Ports (`PublicAccessPort`, `BuyerPort`, `SellerPort`, `LogisticsOperatorPort`, `AdministratorPort`, `SupervisorPort`).
 
-### Responsibilities
-
-- Receive HTTP requests.
-- Validate incoming data.
-- Convert Request DTOs into Domain Models.
-- Execute application use cases (Input Ports).
-- Convert domain results into Response DTOs.
-
-### Controllers
-
-Expose REST endpoints (e.g. `/orders`, `/products`, `/inventory`, `/returns`). Controllers must never implement business rules — they delegate execution to the domain through Input Ports.
-
-### Requests / Responses
-
-DTOs that transport data in and out of the application. They must not contain business logic.
-
-### Mappers
-
-Convert between Request DTO ↔ Domain Model and Domain Model ↔ Response DTO, preventing the domain from depending on transport objects.
+- Annotated with `@Service`.
+- Wire and coordinate granular pure domain services (`domain/services/*`).
+- Execute transactions and enforce business workflow orchestrations.
 
 ---
 
-## Output Adapters (`adapters/out/persistence/`)
+## REST Adapters (`adapters/rest/`)
 
-Connect the domain with external resources. This matches the two persistence dependencies already declared in `pom.xml`: `spring-boot-starter-data-jpa` (MySQL) and `spring-boot-starter-mongodb`.
+Expose the application to external clients (buyers, sellers, administrators, logistics operators, and supervisors interacting through HTTP/REST).
+
+### Controllers (`adapters/rest/controllers/`)
+
+Expose REST endpoints organized by role (e.g. `PublicAccessController`, `BuyerController`, `SellerController`, `LogisticsOperatorController`, `AdministratorController`, `SupervisorController`). Controllers delegate execution directly to the Role Input Ports.
+
+### DTOs (`adapters/rest/dtos/requests/` & `adapters/rest/dtos/responses/`)
+
+Transport objects entering and exiting the REST API with Bean Validation constraints (`@NotNull`, `@Size`, `@Positive`). DTOs never enter the Domain layer.
+
+### Mappers (`adapters/rest/mappers/`)
+
+Convert between Request DTO ↔ Domain Model and Domain Model ↔ Response DTO.
+
+### Global Exception Handler (`adapters/rest/exception/`)
+
+Intercepts Domain and Validation exceptions and transforms them into standardized `ErrorResponse` envelopes with appropriate HTTP status codes (400, 401, 403, 404, 409, 500).
+
+---
+
+## Persistence Adapters (`adapters/persistence/`)
+
+Connect the domain with external database technologies:
 
 ```text
-Persistence
-├── MySQL
-└── MongoDB
+adapters/persistence/
+├── jpa/
+│   ├── entities/
+│   ├── repositories/
+│   ├── mappers/
+│   └── adapters/
+└── mongodb/
+    ├── documents/
+    ├── repositories/
+    ├── mappers/
+    └── adapters/
 ```
 
 ### MySQL Adapter
@@ -467,7 +499,7 @@ This architecture provides:
 
 The following rules must always be respected:
 
-1. Business logic belongs exclusively to the Domain layer (`domains/`, `valueObjects/`, `services/`, `exceptions/`).
+1. Business logic belongs exclusively to the Domain layer (`domain/models/`, `domain/valueObjects/`, `domain/services/`, `domain/exceptions/`).
 2. Controllers must not contain business rules.
 3. DTOs must never enter the Domain layer.
 4. Persistence entities and MongoDB documents must never be exposed through the API.

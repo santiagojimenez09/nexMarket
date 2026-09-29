@@ -1,4 +1,4 @@
-﻿package application.domain.models;
+package application.domain.models;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-﻿package application.domain.services.inventory;
+package application.domain.services.inventory;
 
 import application.domain.models.Inventory;
 import application.domain.models.Product;

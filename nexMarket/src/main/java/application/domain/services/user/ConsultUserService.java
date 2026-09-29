@@ -1,4 +1,4 @@
-﻿package application.domain.services.user;
+package application.domain.services.user;
 
 import application.domain.models.User;
 import application.domain.exceptions.EntityNotFoundException;

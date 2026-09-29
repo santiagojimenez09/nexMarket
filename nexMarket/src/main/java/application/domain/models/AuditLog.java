@@ -1,4 +1,4 @@
-﻿package application.domain.models;
+package application.domain.models;
 
 import application.domain.valueObjects.OperationType;
 import application.domain.valueObjects.UserRole;

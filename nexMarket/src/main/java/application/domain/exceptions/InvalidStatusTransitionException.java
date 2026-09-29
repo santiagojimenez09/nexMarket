@@ -1,4 +1,4 @@
-﻿package application.domain.exceptions;
+package application.domain.exceptions;
 
 public class InvalidStatusTransitionException extends DomainException {
     public InvalidStatusTransitionException(String message) {

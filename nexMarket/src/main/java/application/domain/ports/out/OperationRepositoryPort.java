@@ -1,4 +1,4 @@
-﻿package application.domain.ports.out;
+package application.domain.ports.out;
 
 import application.domain.models.Operation;
 import application.domain.models.TrackableProcess;

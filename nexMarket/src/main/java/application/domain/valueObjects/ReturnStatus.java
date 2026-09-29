@@ -1,4 +1,4 @@
-﻿package application.domain.valueObjects;
+package application.domain.valueObjects;
 
 public enum ReturnStatus {
 

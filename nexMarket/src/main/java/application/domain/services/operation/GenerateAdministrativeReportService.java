@@ -1,4 +1,4 @@
-﻿package application.domain.services.operation;
+package application.domain.services.operation;
 
 import application.domain.models.Operation;
 import application.domain.models.Supervisor;

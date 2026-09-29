@@ -1,4 +1,4 @@
-﻿package application.domain.exceptions;
+package application.domain.exceptions;
 
 public class InvalidOrderStatusException extends DomainException {
     public InvalidOrderStatusException(String message) {

@@ -1,4 +1,4 @@
-﻿package application.domain.services.authorization;
+package application.domain.services.authorization;
 
 import application.domain.models.Buyer;
 import application.domain.models.TrackableProcess;

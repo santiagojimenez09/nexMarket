@@ -1,4 +1,4 @@
-﻿package application.domain.services.buyer;
+package application.domain.services.buyer;
 
 import application.domain.models.Buyer;
 import application.domain.models.Order;
