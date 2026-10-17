@@ -1,6 +1,6 @@
 package application.domain.models;
 
-import application.domain.valueObjects.NotificationChannel;
+import application.domain.enums.NotificationChannel;
 import lombok.Getter;
 import lombok.Setter;
 

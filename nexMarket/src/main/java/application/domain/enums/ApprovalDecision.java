@@ -1,8 +1,6 @@
-package application.domain.valueObjects;
+package application.domain.enums;
 
 public enum ApprovalDecision {
-
     APPROVED,
     REJECTED
-
 }

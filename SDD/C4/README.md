@@ -34,7 +34,8 @@ nexMarket/src/main/java/application/
 │   └── notification/           → Adaptador de notificación (NotificationPort)
 ├── domain/                     → 09 (Núcleo puro desacoplado de frameworks)
 │   ├── models/                 → Modelos de entidad (User, Buyer, Seller, Product, Order, etc.)
-│   ├── valueObjects/           → Tipos de valor inmutables y estados
+│   ├── enums/                  → Enumeraciones operativas (ApprovalDecision, AuditSeverity, NotificationChannel)
+│   ├── valueObjects/           → Tipos de valor inmutables y estados (UserRole, UserStatus, OrderStatus, etc.)
 │   ├── exceptions/             → Excepciones de dominio tipadas
 │   ├── ports/
 │   │   ├── in/                 → Puertos primarios segregados por rol (PublicAccess, Buyer, etc.)

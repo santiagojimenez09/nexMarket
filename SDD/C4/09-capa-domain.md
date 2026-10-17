@@ -9,7 +9,8 @@ El paquete `application/domain/` alberga el núcleo de la lógica del marketplac
 ```text
 application/domain/
 ├── models/         # Entidades de dominio y agregados
-├── valueObjects/   # Tipos de valor inmutables, enums y estados de procesos
+├── enums/          # Enumeraciones puras de decisión operativa (ApprovalDecision, AuditSeverity, NotificationChannel)
+├── valueObjects/   # Tipos de valor inmutables y estados de procesos (UserRole, UserStatus, OrderStatus, etc.)
 ├── exceptions/     # Excepciones de negocio tipadas
 ├── ports/
 │   ├── in/         # Puertos de entrada por rol (contratos hacia useCases)
