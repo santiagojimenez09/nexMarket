@@ -14,4 +14,5 @@ public abstract class User {
     private String password;
     private UserRole role;
     private UserStatus status;
+    private Integer authTokenVersion = 1;
 }

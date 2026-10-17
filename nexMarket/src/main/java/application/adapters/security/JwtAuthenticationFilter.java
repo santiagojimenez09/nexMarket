@@ -1,5 +1,6 @@
-package application.infrastructure.security;
+package application.adapters.security;
 
+import application.adapters.security.dtos.AuthenticatedUserPrincipal;
 import application.domain.models.User;
 import application.domain.valueObjects.UserStatus;
 import jakarta.servlet.FilterChain;
@@ -9,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -20,7 +20,6 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
-    private final MarketUserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -30,14 +29,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = extractBearerToken(request);
 
         if (token != null && jwtProvider.validateToken(token)) {
-            String username = jwtProvider.extractUsername(token);
+            Integer tokenVersion = jwtProvider.extractTokenVersion(token);
 
             try {
-                AuthenticatedUserPrincipal principal =
-                        (AuthenticatedUserPrincipal) userDetailsService.loadUserByUsername(username);
-                User current = principal.getUser();
+                // Reconstrucción del User completo desde los claims del token sin round-trip a BD
+                User current = jwtProvider.reconstructUser(token);
+                AuthenticatedUserPrincipal principal = new AuthenticatedUserPrincipal(current);
 
-                if (current != null && current.getStatus() == UserStatus.ACTIVE) {
+                if (tokenVersion != null && isUsable(current, tokenVersion)) {
                     UsernamePasswordAuthenticationToken auth =
                             new UsernamePasswordAuthenticationToken(
                                     principal, null, principal.getAuthorities());
@@ -45,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 } else {
                     SecurityContextHolder.clearContext();
                 }
-            } catch (UsernameNotFoundException e) {
+            } catch (Exception e) {
                 SecurityContextHolder.clearContext();
             }
         }
@@ -53,10 +52,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    private boolean isUsable(User stored, Integer tokenVersion) {
+        if (stored == null || !UserStatus.ACTIVE.equals(stored.getStatus())) {
+            return false;
+        }
+        Integer storedVersion = stored.getAuthTokenVersion();
+        if (storedVersion == null) {
+            storedVersion = 1;
+        }
+        return storedVersion.equals(tokenVersion);
+    }
+
     private String extractBearerToken(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            return authHeader.substring(7);
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
         }
         return null;
     }

@@ -1,4 +1,4 @@
-package application.infrastructure.security;
+package application.adapters.security;
 
 import application.domain.models.Buyer;
 import application.domain.models.TrackableProcess;

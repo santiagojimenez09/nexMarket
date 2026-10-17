@@ -1,4 +1,4 @@
-package application.infrastructure.notification;
+package application.adapters.notification;
 
 import application.domain.models.Notification;
 import application.domain.ports.out.NotificationPort;
@@ -9,6 +9,6 @@ public class NoOpNotificationAdapter implements NotificationPort {
 
     @Override
     public void send(Notification notification) {
-        // No-op placeholder for notification delivery (email, SMS, push)
+        // Adaptador de salida para entrega de notificaciones (email, SMS, push)
     }
 }

@@ -11,7 +11,7 @@ import application.adapters.rest.mappers.ProductRestMapper;
 import application.adapters.rest.mappers.SellerRestMapper;
 import application.domain.models.*;
 import application.domain.ports.in.SellerPort;
-import application.infrastructure.security.AuthenticatedUserPrincipal;
+import application.adapters.security.dtos.AuthenticatedUserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

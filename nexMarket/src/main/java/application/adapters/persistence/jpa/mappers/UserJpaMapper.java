@@ -1,8 +1,7 @@
 package application.adapters.persistence.jpa.mappers;
 
 import application.adapters.persistence.jpa.entities.UserJpaEntity;
-import application.domain.models.Buyer;
-import application.domain.models.User;
+import application.domain.models.*;
 import application.domain.valueObjects.UserRole;
 import application.domain.valueObjects.UserStatus;
 
@@ -17,22 +16,44 @@ public class UserJpaMapper {
                 .password(domain.getPassword())
                 .role(domain.getRole() != null ? domain.getRole().name() : null)
                 .status(domain.getStatus() != null ? domain.getStatus().name() : null)
+                .authTokenVersion(domain.getAuthTokenVersion() != null ? domain.getAuthTokenVersion() : 1)
                 .build();
     }
 
     public static User toDomain(UserJpaEntity entity) {
         if (entity == null) return null;
-        Buyer user = new Buyer();
+        UserRole role = null;
+        if (entity.getRole() != null) {
+            try {
+                role = UserRole.valueOf(entity.getRole());
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
+
+        User user = createUserForRole(role);
         user.setIdentifier(entity.getIdentifier());
         user.setFullName(entity.getName());
         user.setEmail(entity.getEmail());
         user.setPassword(entity.getPassword());
-        if (entity.getRole() != null) {
-            user.setRole(UserRole.valueOf(entity.getRole()));
-        }
+        user.setRole(role);
         if (entity.getStatus() != null) {
-            user.setStatus(UserStatus.valueOf(entity.getStatus()));
+            try {
+                user.setStatus(UserStatus.valueOf(entity.getStatus()));
+            } catch (IllegalArgumentException ignored) {
+            }
         }
+        user.setAuthTokenVersion(entity.getAuthTokenVersion() != null ? entity.getAuthTokenVersion() : 1);
         return user;
+    }
+
+    private static User createUserForRole(UserRole role) {
+        if (role == null) return new Buyer();
+        return switch (role) {
+            case BUYER -> new Buyer();
+            case SELLER -> new Seller();
+            case LOGISTICS_OPERATOR -> new LogisticsOperator();
+            case ADMINISTRATOR -> new Administrator();
+            case SUPERVISOR -> new Supervisor();
+        };
     }
 }

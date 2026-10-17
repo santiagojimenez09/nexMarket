@@ -9,7 +9,7 @@ import application.domain.models.Buyer;
 import application.domain.models.Order;
 import application.domain.models.User;
 import application.domain.ports.in.SupervisorPort;
-import application.infrastructure.security.AuthenticatedUserPrincipal;
+import application.adapters.security.dtos.AuthenticatedUserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

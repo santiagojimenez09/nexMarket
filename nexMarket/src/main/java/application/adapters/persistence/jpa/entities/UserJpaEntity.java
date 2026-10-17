@@ -37,4 +37,8 @@ public class UserJpaEntity {
 
     @Column(name = "status", length = 50, nullable = false)
     private String status;
+
+    @Column(name = "auth_token_version", nullable = false)
+    @Builder.Default
+    private Integer authTokenVersion = 1;
 }

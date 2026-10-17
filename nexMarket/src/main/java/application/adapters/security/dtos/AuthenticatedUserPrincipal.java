@@ -1,4 +1,4 @@
-package application.infrastructure.security;
+package application.adapters.security.dtos;
 
 import application.domain.models.User;
 import application.domain.valueObjects.UserStatus;
@@ -11,6 +11,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 
+/**
+ * Spring Security principal que envuelve el {@link User} reconstruido
+ * desde los claims del JWT o cargado por UserDetailsService.
+ */
 @Getter
 @RequiredArgsConstructor
 public class AuthenticatedUserPrincipal implements UserDetails {
@@ -33,7 +37,7 @@ public class AuthenticatedUserPrincipal implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user != null ? user.getIdentifier() : null;
+        return user != null ? user.getEmail() : null;
     }
 
     @Override

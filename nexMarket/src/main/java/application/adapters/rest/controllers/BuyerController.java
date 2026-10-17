@@ -13,7 +13,7 @@ import application.adapters.rest.mappers.OrderRestMapper;
 import application.adapters.rest.mappers.ReturnRestMapper;
 import application.domain.models.*;
 import application.domain.ports.in.BuyerPort;
-import application.infrastructure.security.AuthenticatedUserPrincipal;
+import application.adapters.security.dtos.AuthenticatedUserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

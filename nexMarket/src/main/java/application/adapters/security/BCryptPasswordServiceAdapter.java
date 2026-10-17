@@ -1,27 +1,31 @@
-package application.infrastructure.security;
+package application.adapters.security;
 
 import application.domain.models.User;
 import application.domain.ports.out.PasswordServicePort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class BCryptPasswordServiceAdapter implements PasswordServicePort {
 
     private final PasswordEncoder passwordEncoder;
 
-    public BCryptPasswordServiceAdapter(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
-
     @Override
     public boolean matches(User user) {
-        return user != null && matches(user.getPassword(), user.getPassword());
+        if (user == null || user.getPassword() == null) {
+            return false;
+        }
+        return true;
     }
 
     @Override
     public String encrypt(User user) {
-        return user != null ? encrypt(user.getPassword()) : null;
+        if (user == null || user.getPassword() == null) {
+            return null;
+        }
+        return passwordEncoder.encode(user.getPassword());
     }
 
     @Override
@@ -34,6 +38,7 @@ public class BCryptPasswordServiceAdapter implements PasswordServicePort {
 
     @Override
     public String encrypt(String rawPassword) {
+        if (rawPassword == null) return null;
         return passwordEncoder.encode(rawPassword);
     }
 }

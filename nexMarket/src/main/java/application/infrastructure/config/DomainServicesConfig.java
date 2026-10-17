@@ -49,6 +49,11 @@ public class DomainServicesConfig {
         return new UpdateUserService(userRepositoryPort);
     }
 
+    @Bean
+    public LoadAuthenticatedUserService loadAuthenticatedUserService(UserRepositoryPort userRepositoryPort) {
+        return new LoadAuthenticatedUserService(userRepositoryPort);
+    }
+
     // --- Buyer Subdomain ---
     @Bean
     public RegisterBuyerService registerBuyerService(BuyerRepositoryPort buyerRepositoryPort,

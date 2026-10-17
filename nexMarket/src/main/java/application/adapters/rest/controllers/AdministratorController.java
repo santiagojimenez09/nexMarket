@@ -14,7 +14,7 @@ import application.domain.ports.in.AdministratorPort;
 import application.domain.valueObjects.BuyerCommercialStatus;
 import application.domain.valueObjects.UserStatus;
 import application.domain.valueObjects.WarehouseStatus;
-import application.infrastructure.security.AuthenticatedUserPrincipal;
+import application.adapters.security.dtos.AuthenticatedUserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
