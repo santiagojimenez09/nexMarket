@@ -24,6 +24,7 @@ public class AuthenticateUserService {
 
     public String authenticate(User user, String rawPassword) {
         User existingUser = userRepositoryPort.findByEmail(user)
+                .or(() -> userRepositoryPort.findByIdentifier(user))
                 .orElseThrow(() -> new EntityNotFoundException("Credenciales inválidas."));
 
         if (existingUser.getStatus() == UserStatus.BLOCKED) {

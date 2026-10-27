@@ -1,9 +1,14 @@
 package application.infrastructure.seed;
 
 import application.domain.models.*;
+import application.domain.ports.out.BuyerRepositoryPort;
 import application.domain.ports.out.PasswordServicePort;
+import application.domain.ports.out.ProductRepositoryPort;
+import application.domain.ports.out.SellerRepositoryPort;
 import application.domain.ports.out.UserRepositoryPort;
 import application.domain.valueObjects.BuyerCommercialStatus;
+import application.domain.valueObjects.ProductStatus;
+import application.domain.valueObjects.ProductType;
 import application.domain.valueObjects.UserRole;
 import application.domain.valueObjects.UserStatus;
 import org.slf4j.Logger;
@@ -11,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
 
 /**
  * Semillas de base de datos para que el 100% de los endpoints funcionen al arrancar:
@@ -20,6 +27,7 @@ import org.springframework.stereotype.Component;
  * - Vendedor (seller@nexmarket.com)
  * - Comprador (buyer@nexmarket.com)
  * - Comprador Bloqueado (blocked@nexmarket.com) para pruebas de autorización
+ * - Producto de ejemplo (PROD-001) para pruebas del carrito
  *
  * Contraseña única académica para todos: Password123*
  * Idempotente por email e identificador.
@@ -33,11 +41,20 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     private final UserRepositoryPort userRepositoryPort;
     private final PasswordServicePort passwordServicePort;
+    private final BuyerRepositoryPort buyerRepositoryPort;
+    private final SellerRepositoryPort sellerRepositoryPort;
+    private final ProductRepositoryPort productRepositoryPort;
 
     public DatabaseSeeder(UserRepositoryPort userRepositoryPort,
-                          PasswordServicePort passwordServicePort) {
+                          PasswordServicePort passwordServicePort,
+                          BuyerRepositoryPort buyerRepositoryPort,
+                          SellerRepositoryPort sellerRepositoryPort,
+                          ProductRepositoryPort productRepositoryPort) {
         this.userRepositoryPort = userRepositoryPort;
         this.passwordServicePort = passwordServicePort;
+        this.buyerRepositoryPort = buyerRepositoryPort;
+        this.sellerRepositoryPort = sellerRepositoryPort;
+        this.productRepositoryPort = productRepositoryPort;
     }
 
     @Override
@@ -47,9 +64,10 @@ public class DatabaseSeeder implements CommandLineRunner {
             seedAdministrator();
             seedSupervisor();
             seedLogisticsOperator();
-            seedSeller();
+            Seller seller = seedSeller();
             seedBuyer();
             seedBlockedBuyer();
+            seedSampleProduct(seller);
             log.info("DatabaseSeeder de nexMarket completado con éxito. Credenciales listas con contraseña: {}", DEFAULT_PASSWORD);
         } catch (Exception e) {
             log.warn("Aviso durante la ejecución de DatabaseSeeder: {}", e.getMessage());
@@ -92,7 +110,7 @@ public class DatabaseSeeder implements CommandLineRunner {
         saveIfAbsent(operator);
     }
 
-    private void seedSeller() {
+    private Seller seedSeller() {
         String email = "seller@nexmarket.com";
         Seller seller = new Seller();
         seller.setIdentifier("USR-SELL-01");
@@ -102,6 +120,12 @@ public class DatabaseSeeder implements CommandLineRunner {
         seller.setStatus(UserStatus.ACTIVE);
         seller.setPassword(passwordServicePort.encrypt(DEFAULT_PASSWORD));
         saveIfAbsent(seller);
+
+        if (sellerRepositoryPort.findByIdentifier(seller).isEmpty()) {
+            sellerRepositoryPort.save(seller);
+            log.info("Vendedor registrado en repositorio: {}", seller.getIdentifier());
+        }
+        return seller;
     }
 
     private void seedBuyer() {
@@ -116,6 +140,11 @@ public class DatabaseSeeder implements CommandLineRunner {
         buyer.setCommercialStatus(BuyerCommercialStatus.ACTIVE);
         buyer.setPassword(passwordServicePort.encrypt(DEFAULT_PASSWORD));
         saveIfAbsent(buyer);
+
+        if (buyerRepositoryPort.findByIdentifier(buyer).isEmpty()) {
+            buyerRepositoryPort.save(buyer);
+            log.info("Comprador registrado en repositorio: {}", buyer.getIdentifier());
+        }
     }
 
     private void seedBlockedBuyer() {
@@ -130,6 +159,27 @@ public class DatabaseSeeder implements CommandLineRunner {
         buyer.setCommercialStatus(BuyerCommercialStatus.RESTRICTED);
         buyer.setPassword(passwordServicePort.encrypt(DEFAULT_PASSWORD));
         saveIfAbsent(buyer);
+
+        if (buyerRepositoryPort.findByIdentifier(buyer).isEmpty()) {
+            buyerRepositoryPort.save(buyer);
+        }
+    }
+
+    private void seedSampleProduct(Seller seller) {
+        PhysicalProduct query = new PhysicalProduct();
+        query.setIdentifier("PROD-001");
+        if (productRepositoryPort.findByIdentifier(query).isEmpty()) {
+            PhysicalProduct product = new PhysicalProduct();
+            product.setIdentifier("PROD-001");
+            product.setName("Laptop Gamer Pro 16GB");
+            product.setDescription("Laptop de alto rendimiento para desarrollo y gaming");
+            product.setProductType(ProductType.PHYSICAL);
+            product.setStatus(ProductStatus.PUBLISHED);
+            product.setSeller(seller);
+            product.setWeight(BigDecimal.valueOf(2.5));
+            productRepositoryPort.save(product);
+            log.info("Producto de ejemplo creado: PROD-001 (Laptop Gamer Pro 16GB)");
+        }
     }
 
     private void saveIfAbsent(User user) {
