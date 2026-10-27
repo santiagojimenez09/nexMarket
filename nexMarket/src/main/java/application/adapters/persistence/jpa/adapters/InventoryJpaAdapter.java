@@ -1,62 +1,68 @@
 package application.adapters.persistence.jpa.adapters;
 
+import application.adapters.persistence.jpa.entities.InventoryJpaEntity;
+import application.adapters.persistence.jpa.mappers.InventoryJpaMapper;
+import application.adapters.persistence.jpa.repositories.SpringDataJpaInventoryRepository;
 import application.domain.models.Inventory;
 import application.domain.models.Product;
 import application.domain.models.Warehouse;
 import application.domain.ports.out.InventoryRepositoryPort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
+@RequiredArgsConstructor
 public class InventoryJpaAdapter implements InventoryRepositoryPort {
 
-    private final Map<String, Inventory> store = new ConcurrentHashMap<>();
-
-    private String buildKey(Inventory inventory) {
-        if (inventory == null) return "";
-        String prodId = inventory.getProduct() != null ? inventory.getProduct().getIdentifier() : "";
-        String whId = inventory.getWarehouse() != null ? inventory.getWarehouse().getIdentifier() : "";
-        return prodId + ":" + whId;
-    }
+    private final SpringDataJpaInventoryRepository inventoryRepository;
 
     @Override
     public Inventory save(Inventory inventory) {
         if (inventory == null) return null;
-        store.put(buildKey(inventory), inventory);
-        return inventory;
+        InventoryJpaEntity entity = InventoryJpaMapper.toEntity(inventory);
+        InventoryJpaEntity saved = inventoryRepository.save(entity);
+        return InventoryJpaMapper.toDomain(saved);
     }
 
     @Override
     public Optional<Inventory> findByProductAndWarehouse(Inventory inventory) {
-        if (inventory == null) return Optional.empty();
-        return Optional.ofNullable(store.get(buildKey(inventory)));
+        if (inventory == null || inventory.getProduct() == null || inventory.getWarehouse() == null) {
+            return Optional.empty();
+        }
+        return inventoryRepository.findByProductIdentifierAndWarehouseIdentifier(
+                inventory.getProduct().getIdentifier(),
+                inventory.getWarehouse().getIdentifier()
+        ).map(InventoryJpaMapper::toDomain);
     }
 
     @Override
     public List<Inventory> findByProduct(Product product) {
-        if (product == null || product.getIdentifier() == null) return List.copyOf(store.values());
-        return store.values().stream()
-                .filter(i -> i.getProduct() != null && product.getIdentifier().equals(i.getProduct().getIdentifier()))
+        if (product == null || product.getIdentifier() == null) {
+            return inventoryRepository.findAll().stream().map(InventoryJpaMapper::toDomain).collect(Collectors.toList());
+        }
+        return inventoryRepository.findByProductIdentifier(product.getIdentifier()).stream()
+                .map(InventoryJpaMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Inventory> findByWarehouse(Warehouse warehouse) {
-        if (warehouse == null || warehouse.getIdentifier() == null) return List.copyOf(store.values());
-        return store.values().stream()
-                .filter(i -> i.getWarehouse() != null && warehouse.getIdentifier().equals(i.getWarehouse().getIdentifier()))
+        if (warehouse == null || warehouse.getIdentifier() == null) {
+            return inventoryRepository.findAll().stream().map(InventoryJpaMapper::toDomain).collect(Collectors.toList());
+        }
+        return inventoryRepository.findByWarehouseIdentifier(warehouse.getIdentifier()).stream()
+                .map(InventoryJpaMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void update(Inventory inventory) {
         if (inventory != null) {
-            store.put(buildKey(inventory), inventory);
+            inventoryRepository.save(InventoryJpaMapper.toEntity(inventory));
         }
     }
 }

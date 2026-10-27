@@ -1,46 +1,48 @@
 package application.adapters.persistence.jpa.adapters;
 
+import application.adapters.persistence.jpa.entities.ShoppingCartJpaEntity;
+import application.adapters.persistence.jpa.mappers.ShoppingCartJpaMapper;
+import application.adapters.persistence.jpa.repositories.SpringDataJpaShoppingCartRepository;
 import application.domain.models.Buyer;
 import application.domain.models.ShoppingCart;
 import application.domain.ports.out.ShoppingCartRepositoryPort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
+@RequiredArgsConstructor
 public class ShoppingCartJpaAdapter implements ShoppingCartRepositoryPort {
 
-    private final Map<String, ShoppingCart> store = new ConcurrentHashMap<>();
-
-    private String getBuyerKey(Buyer buyer) {
-        return buyer != null && buyer.getIdentifier() != null ? buyer.getIdentifier() : "";
-    }
+    private final SpringDataJpaShoppingCartRepository shoppingCartRepository;
 
     @Override
     public ShoppingCart save(ShoppingCart cart) {
-        if (cart != null && cart.getBuyer() != null) {
-            store.put(getBuyerKey(cart.getBuyer()), cart);
-        }
-        return cart;
+        if (cart == null) return null;
+        ShoppingCartJpaEntity entity = ShoppingCartJpaMapper.toEntity(cart);
+        ShoppingCartJpaEntity saved = shoppingCartRepository.save(entity);
+        return ShoppingCartJpaMapper.toDomain(saved);
     }
 
     @Override
     public Optional<ShoppingCart> findByBuyer(Buyer buyer) {
         if (buyer == null || buyer.getIdentifier() == null) return Optional.empty();
-        return Optional.ofNullable(store.get(getBuyerKey(buyer)));
+        return shoppingCartRepository.findByBuyerIdentifier(buyer.getIdentifier())
+                .map(ShoppingCartJpaMapper::toDomain);
     }
 
     @Override
     public void update(ShoppingCart cart) {
-        save(cart);
+        if (cart != null && cart.getBuyer() != null && cart.getBuyer().getIdentifier() != null) {
+            shoppingCartRepository.save(ShoppingCartJpaMapper.toEntity(cart));
+        }
     }
 
     @Override
     public void delete(ShoppingCart cart) {
-        if (cart != null && cart.getBuyer() != null) {
-            store.remove(getBuyerKey(cart.getBuyer()));
+        if (cart != null && cart.getBuyer() != null && cart.getBuyer().getIdentifier() != null) {
+            shoppingCartRepository.deleteById(cart.getBuyer().getIdentifier());
         }
     }
 }

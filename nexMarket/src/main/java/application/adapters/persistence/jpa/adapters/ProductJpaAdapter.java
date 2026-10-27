@@ -1,66 +1,70 @@
 package application.adapters.persistence.jpa.adapters;
 
+import application.adapters.persistence.jpa.entities.ProductJpaEntity;
+import application.adapters.persistence.jpa.mappers.ProductJpaMapper;
+import application.adapters.persistence.jpa.repositories.SpringDataJpaProductRepository;
 import application.domain.models.Product;
 import application.domain.models.Seller;
 import application.domain.ports.out.ProductRepositoryPort;
 import application.domain.valueObjects.ProductStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
+@RequiredArgsConstructor
 public class ProductJpaAdapter implements ProductRepositoryPort {
 
-    private final Map<String, Product> store = new ConcurrentHashMap<>();
+    private final SpringDataJpaProductRepository productRepository;
 
     @Override
     public Product save(Product product) {
-        if (product == null || product.getIdentifier() == null) return product;
-        store.put(product.getIdentifier(), product);
-        return product;
+        if (product == null) return null;
+        ProductJpaEntity entity = ProductJpaMapper.toEntity(product);
+        ProductJpaEntity saved = productRepository.save(entity);
+        return ProductJpaMapper.toDomain(saved);
     }
 
     @Override
     public Optional<Product> findByIdentifier(Product product) {
         if (product == null || product.getIdentifier() == null) return Optional.empty();
-        return Optional.ofNullable(store.get(product.getIdentifier()));
+        return productRepository.findById(product.getIdentifier()).map(ProductJpaMapper::toDomain);
     }
 
     @Override
     public List<Product> findBySeller(Seller seller) {
         if (seller == null || seller.getIdentifier() == null) {
-            return List.copyOf(store.values());
+            return productRepository.findAll().stream().map(ProductJpaMapper::toDomain).collect(Collectors.toList());
         }
-        return store.values().stream()
-                .filter(p -> p.getSeller() != null && seller.getIdentifier().equals(p.getSeller().getIdentifier()))
+        return productRepository.findBySellerIdentifier(seller.getIdentifier()).stream()
+                .map(ProductJpaMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Product> findByStatus(Product product) {
         if (product == null || product.getStatus() == null) {
-            return List.copyOf(store.values());
+            return productRepository.findAll().stream().map(ProductJpaMapper::toDomain).collect(Collectors.toList());
         }
-        return store.values().stream()
-                .filter(p -> product.getStatus().equals(p.getStatus()))
+        return productRepository.findByStatus(product.getStatus().name()).stream()
+                .map(ProductJpaMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Product> findPublishedCatalog() {
-        return store.values().stream()
-                .filter(p -> ProductStatus.PUBLISHED.equals(p.getStatus()))
+        return productRepository.findByStatus(ProductStatus.PUBLISHED.name()).stream()
+                .map(ProductJpaMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void update(Product product) {
         if (product != null && product.getIdentifier() != null) {
-            store.put(product.getIdentifier(), product);
+            productRepository.save(ProductJpaMapper.toEntity(product));
         }
     }
 }

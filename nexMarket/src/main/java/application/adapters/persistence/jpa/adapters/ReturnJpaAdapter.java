@@ -1,54 +1,62 @@
 package application.adapters.persistence.jpa.adapters;
 
+import application.adapters.persistence.jpa.entities.ReturnJpaEntity;
+import application.adapters.persistence.jpa.mappers.ReturnJpaMapper;
+import application.adapters.persistence.jpa.repositories.SpringDataJpaReturnRepository;
 import application.domain.models.Order;
 import application.domain.models.Return;
 import application.domain.ports.out.ReturnRepositoryPort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
+@RequiredArgsConstructor
 public class ReturnJpaAdapter implements ReturnRepositoryPort {
 
-    private final Map<String, Return> store = new ConcurrentHashMap<>();
+    private final SpringDataJpaReturnRepository returnRepository;
 
     @Override
     public Return save(Return returnRequest) {
-        if (returnRequest == null || returnRequest.getIdentifier() == null) return returnRequest;
-        store.put(returnRequest.getIdentifier(), returnRequest);
-        return returnRequest;
+        if (returnRequest == null) return null;
+        ReturnJpaEntity entity = ReturnJpaMapper.toEntity(returnRequest);
+        ReturnJpaEntity saved = returnRepository.save(entity);
+        return ReturnJpaMapper.toDomain(saved);
     }
 
     @Override
     public Optional<Return> findByIdentifier(Return returnRequest) {
         if (returnRequest == null || returnRequest.getIdentifier() == null) return Optional.empty();
-        return Optional.ofNullable(store.get(returnRequest.getIdentifier()));
+        return returnRepository.findById(returnRequest.getIdentifier()).map(ReturnJpaMapper::toDomain);
     }
 
     @Override
     public List<Return> findByOrder(Order order) {
-        if (order == null || order.getIdentifier() == null) return List.copyOf(store.values());
-        return store.values().stream()
-                .filter(r -> r.getOrder() != null && order.getIdentifier().equals(r.getOrder().getIdentifier()))
+        if (order == null || order.getIdentifier() == null) {
+            return returnRepository.findAll().stream().map(ReturnJpaMapper::toDomain).collect(Collectors.toList());
+        }
+        return returnRepository.findByOrderIdentifier(order.getIdentifier()).stream()
+                .map(ReturnJpaMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Return> findByStatus(Return returnRequest) {
-        if (returnRequest == null || returnRequest.getReturnStatus() == null) return List.copyOf(store.values());
-        return store.values().stream()
-                .filter(r -> returnRequest.getReturnStatus() == r.getReturnStatus())
+        if (returnRequest == null || returnRequest.getReturnStatus() == null) {
+            return returnRepository.findAll().stream().map(ReturnJpaMapper::toDomain).collect(Collectors.toList());
+        }
+        return returnRepository.findByReturnStatus(returnRequest.getReturnStatus().name()).stream()
+                .map(ReturnJpaMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void update(Return returnRequest) {
         if (returnRequest != null && returnRequest.getIdentifier() != null) {
-            store.put(returnRequest.getIdentifier(), returnRequest);
+            returnRepository.save(ReturnJpaMapper.toEntity(returnRequest));
         }
     }
 }

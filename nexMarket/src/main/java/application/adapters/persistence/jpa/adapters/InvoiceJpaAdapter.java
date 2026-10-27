@@ -1,42 +1,46 @@
 package application.adapters.persistence.jpa.adapters;
 
+import application.adapters.persistence.jpa.entities.InvoiceJpaEntity;
+import application.adapters.persistence.jpa.mappers.InvoiceJpaMapper;
+import application.adapters.persistence.jpa.repositories.SpringDataJpaInvoiceRepository;
 import application.domain.models.Buyer;
 import application.domain.models.Invoice;
 import application.domain.models.Order;
 import application.domain.ports.out.InvoiceRepositoryPort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
+@RequiredArgsConstructor
 public class InvoiceJpaAdapter implements InvoiceRepositoryPort {
 
-    private final Map<String, Invoice> store = new ConcurrentHashMap<>();
+    private final SpringDataJpaInvoiceRepository invoiceRepository;
 
     @Override
     public Invoice save(Invoice invoice) {
-        if (invoice == null || invoice.getIdentifier() == null) return invoice;
-        store.put(invoice.getIdentifier(), invoice);
-        return invoice;
+        if (invoice == null) return null;
+        InvoiceJpaEntity entity = InvoiceJpaMapper.toEntity(invoice);
+        InvoiceJpaEntity saved = invoiceRepository.save(entity);
+        return InvoiceJpaMapper.toDomain(saved);
     }
 
     @Override
     public Optional<Invoice> findByOrder(Order order) {
         if (order == null || order.getIdentifier() == null) return Optional.empty();
-        return store.values().stream()
-                .filter(i -> i.getOrder() != null && order.getIdentifier().equals(i.getOrder().getIdentifier()))
-                .findFirst();
+        return invoiceRepository.findByOrderIdentifier(order.getIdentifier()).map(InvoiceJpaMapper::toDomain);
     }
 
     @Override
     public List<Invoice> findByBuyer(Buyer buyer) {
-        if (buyer == null || buyer.getIdentifier() == null) return List.copyOf(store.values());
-        return store.values().stream()
-                .filter(i -> i.getBuyer() != null && buyer.getIdentifier().equals(i.getBuyer().getIdentifier()))
+        if (buyer == null || buyer.getIdentifier() == null) {
+            return invoiceRepository.findAll().stream().map(InvoiceJpaMapper::toDomain).collect(Collectors.toList());
+        }
+        return invoiceRepository.findByBuyerIdentifier(buyer.getIdentifier()).stream()
+                .map(InvoiceJpaMapper::toDomain)
                 .collect(Collectors.toList());
     }
 }

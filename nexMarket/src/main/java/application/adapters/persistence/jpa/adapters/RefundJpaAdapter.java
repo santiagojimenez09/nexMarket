@@ -1,48 +1,52 @@
 package application.adapters.persistence.jpa.adapters;
 
+import application.adapters.persistence.jpa.entities.RefundJpaEntity;
+import application.adapters.persistence.jpa.mappers.RefundJpaMapper;
+import application.adapters.persistence.jpa.repositories.SpringDataJpaRefundRepository;
 import application.domain.models.Refund;
 import application.domain.models.Return;
 import application.domain.ports.out.RefundRepositoryPort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Repository
+@RequiredArgsConstructor
 public class RefundJpaAdapter implements RefundRepositoryPort {
 
-    private final Map<String, Refund> store = new ConcurrentHashMap<>();
+    private final SpringDataJpaRefundRepository refundRepository;
 
     @Override
     public Refund save(Refund refund) {
-        if (refund == null || refund.getIdentifier() == null) return refund;
-        store.put(refund.getIdentifier(), refund);
-        return refund;
+        if (refund == null) return null;
+        RefundJpaEntity entity = RefundJpaMapper.toEntity(refund);
+        RefundJpaEntity saved = refundRepository.save(entity);
+        return RefundJpaMapper.toDomain(saved);
     }
 
     @Override
     public Optional<Refund> findByReturn(Return returnRequest) {
         if (returnRequest == null || returnRequest.getIdentifier() == null) return Optional.empty();
-        return store.values().stream()
-                .filter(r -> r.getRelatedReturn() != null && returnRequest.getIdentifier().equals(r.getRelatedReturn().getIdentifier()))
-                .findFirst();
+        return refundRepository.findByReturnIdentifier(returnRequest.getIdentifier()).map(RefundJpaMapper::toDomain);
     }
 
     @Override
     public List<Refund> findByStatus(Refund refund) {
-        if (refund == null || refund.getRefundStatus() == null) return List.copyOf(store.values());
-        return store.values().stream()
-                .filter(r -> refund.getRefundStatus() == r.getRefundStatus())
+        if (refund == null || refund.getRefundStatus() == null) {
+            return refundRepository.findAll().stream().map(RefundJpaMapper::toDomain).collect(Collectors.toList());
+        }
+        return refundRepository.findByRefundStatus(refund.getRefundStatus().name()).stream()
+                .map(RefundJpaMapper::toDomain)
                 .collect(Collectors.toList());
     }
 
     @Override
     public void update(Refund refund) {
         if (refund != null && refund.getIdentifier() != null) {
-            store.put(refund.getIdentifier(), refund);
+            refundRepository.save(RefundJpaMapper.toEntity(refund));
         }
     }
 }
