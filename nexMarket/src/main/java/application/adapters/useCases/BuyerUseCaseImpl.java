@@ -21,6 +21,7 @@ import application.domain.services.cart.RemoveItemFromCartService;
 import application.domain.services.cart.UpdateCartItemService;
 import application.domain.services.invoicing.ConsultInvoiceService;
 import application.domain.services.order.ConfirmOrderService;
+import application.domain.services.order.ConfirmPaymentService;
 import application.domain.services.order.ConsultOrderService;
 import application.domain.services.returns.RequestReturnService;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,7 @@ public class BuyerUseCaseImpl implements BuyerPort {
     private final RemoveItemFromCartService removeItemFromCartService;
     private final ClearCartService clearCartService;
     private final ConfirmOrderService confirmOrderService;
+    private final ConfirmPaymentService confirmPaymentService;
     private final ConsultOrderService consultOrderService;
     private final ConsultBuyerOrdersService consultBuyerOrdersService;
     private final ConsultInvoiceService consultInvoiceService;
@@ -94,6 +96,11 @@ public class BuyerUseCaseImpl implements BuyerPort {
     public Order checkoutCart(User user) {
         Buyer target = consultMyProfile(user);
         return confirmOrderService.confirmOrder(target);
+    }
+
+    @Override
+    public Order payOrder(User user, Order order) {
+        return confirmPaymentService.confirmPayment(order);
     }
 
     @Override

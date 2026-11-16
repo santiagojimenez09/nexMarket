@@ -116,4 +116,10 @@ public class SellerController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/reports/summary")
+    public ResponseEntity<java.util.Map<String, Object>> getSellerReport(@AuthenticationPrincipal AuthenticatedUserPrincipal principal) {
+        java.util.Map<String, Object> report = sellerPort.generateSellerReport(principal.getUser());
+        return ResponseEntity.ok(report);
+    }
 }

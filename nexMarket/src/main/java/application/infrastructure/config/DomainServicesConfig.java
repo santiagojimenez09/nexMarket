@@ -200,8 +200,9 @@ public class DomainServicesConfig {
     @Bean
     public AddItemToCartService addItemToCartService(ShoppingCartRepositoryPort shoppingCartRepositoryPort,
                                                      ProductRepositoryPort productRepositoryPort,
-                                                     BuyerRepositoryPort buyerRepositoryPort) {
-        return new AddItemToCartService(shoppingCartRepositoryPort, productRepositoryPort, buyerRepositoryPort);
+                                                     BuyerRepositoryPort buyerRepositoryPort,
+                                                     InventoryRepositoryPort inventoryRepositoryPort) {
+        return new AddItemToCartService(shoppingCartRepositoryPort, productRepositoryPort, buyerRepositoryPort, inventoryRepositoryPort);
     }
 
     @Bean

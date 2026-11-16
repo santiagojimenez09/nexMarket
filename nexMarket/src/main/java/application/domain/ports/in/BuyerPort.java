@@ -23,6 +23,7 @@ public interface BuyerPort {
     
     // Orders
     Order checkoutCart(User user);
+    Order payOrder(User user, Order order);
     Order consultOrder(User user, Order order);
     List<Order> consultMyOrders(User user);
     

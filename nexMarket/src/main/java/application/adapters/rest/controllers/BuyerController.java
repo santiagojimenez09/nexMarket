@@ -90,6 +90,15 @@ public class BuyerController {
         return ResponseEntity.status(HttpStatus.CREATED).body(OrderRestMapper.toResponseDTO(order));
     }
 
+    @PostMapping("/orders/{identifier}/pay")
+    public ResponseEntity<OrderResponseDTO> payOrder(@AuthenticationPrincipal AuthenticatedUserPrincipal principal,
+                                                     @PathVariable String identifier) {
+        Order query = new Order();
+        query.setIdentifier(identifier);
+        Order order = buyerPort.payOrder(principal.getUser(), query);
+        return ResponseEntity.ok(OrderRestMapper.toResponseDTO(order));
+    }
+
     @GetMapping("/orders")
     public ResponseEntity<List<OrderResponseDTO>> getMyOrders(@AuthenticationPrincipal AuthenticatedUserPrincipal principal) {
         List<Order> orders = buyerPort.consultMyOrders(principal.getUser());

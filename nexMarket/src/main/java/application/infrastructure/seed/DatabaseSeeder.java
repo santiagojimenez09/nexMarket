@@ -2,15 +2,20 @@ package application.infrastructure.seed;
 
 import application.domain.models.*;
 import application.domain.ports.out.BuyerRepositoryPort;
+import application.domain.ports.out.InventoryRepositoryPort;
 import application.domain.ports.out.PasswordServicePort;
 import application.domain.ports.out.ProductRepositoryPort;
 import application.domain.ports.out.SellerRepositoryPort;
 import application.domain.ports.out.UserRepositoryPort;
+import application.domain.ports.out.WarehouseRepositoryPort;
 import application.domain.valueObjects.BuyerCommercialStatus;
+import application.domain.valueObjects.InventoryConditionStatus;
 import application.domain.valueObjects.ProductStatus;
 import application.domain.valueObjects.ProductType;
 import application.domain.valueObjects.UserRole;
 import application.domain.valueObjects.UserStatus;
+import application.domain.valueObjects.WarehouseStatus;
+import application.domain.valueObjects.WarehouseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -44,17 +49,23 @@ public class DatabaseSeeder implements CommandLineRunner {
     private final BuyerRepositoryPort buyerRepositoryPort;
     private final SellerRepositoryPort sellerRepositoryPort;
     private final ProductRepositoryPort productRepositoryPort;
+    private final WarehouseRepositoryPort warehouseRepositoryPort;
+    private final InventoryRepositoryPort inventoryRepositoryPort;
 
     public DatabaseSeeder(UserRepositoryPort userRepositoryPort,
                           PasswordServicePort passwordServicePort,
                           BuyerRepositoryPort buyerRepositoryPort,
                           SellerRepositoryPort sellerRepositoryPort,
-                          ProductRepositoryPort productRepositoryPort) {
+                          ProductRepositoryPort productRepositoryPort,
+                          WarehouseRepositoryPort warehouseRepositoryPort,
+                          InventoryRepositoryPort inventoryRepositoryPort) {
         this.userRepositoryPort = userRepositoryPort;
         this.passwordServicePort = passwordServicePort;
         this.buyerRepositoryPort = buyerRepositoryPort;
         this.sellerRepositoryPort = sellerRepositoryPort;
         this.productRepositoryPort = productRepositoryPort;
+        this.warehouseRepositoryPort = warehouseRepositoryPort;
+        this.inventoryRepositoryPort = inventoryRepositoryPort;
     }
 
     @Override
@@ -166,19 +177,49 @@ public class DatabaseSeeder implements CommandLineRunner {
     }
 
     private void seedSampleProduct(Seller seller) {
+        Warehouse warQuery = new Warehouse();
+        warQuery.setIdentifier("WAR-BOG-01");
+        Warehouse warehouse = warehouseRepositoryPort.findByIdentifier(warQuery).orElseGet(() -> {
+            Warehouse w = new Warehouse();
+            w.setIdentifier("WAR-BOG-01");
+            w.setName("Bodega Principal Fontibón");
+            w.setAddress("Zona Franca Calle 13 #100-20, Bogotá");
+            w.setType(WarehouseType.MAIN);
+            w.setStatus(WarehouseStatus.ACTIVE);
+            w.setOwner(seller);
+            Warehouse savedW = warehouseRepositoryPort.save(w);
+            log.info("Bodega inicial creada: WAR-BOG-01 (Bodega Principal Fontibón)");
+            return savedW;
+        });
+
         PhysicalProduct query = new PhysicalProduct();
         query.setIdentifier("PROD-001");
-        if (productRepositoryPort.findByIdentifier(query).isEmpty()) {
-            PhysicalProduct product = new PhysicalProduct();
-            product.setIdentifier("PROD-001");
-            product.setName("Laptop Gamer Pro 16GB");
-            product.setDescription("Laptop de alto rendimiento para desarrollo y gaming");
-            product.setProductType(ProductType.PHYSICAL);
-            product.setStatus(ProductStatus.PUBLISHED);
-            product.setSeller(seller);
-            product.setWeight(BigDecimal.valueOf(2.5));
-            productRepositoryPort.save(product);
+        PhysicalProduct product = (PhysicalProduct) productRepositoryPort.findByIdentifier(query).orElseGet(() -> {
+            PhysicalProduct p = new PhysicalProduct();
+            p.setIdentifier("PROD-001");
+            p.setName("Laptop Gamer Pro 16GB");
+            p.setDescription("Laptop de alto rendimiento para desarrollo y gaming");
+            p.setProductType(ProductType.PHYSICAL);
+            p.setStatus(ProductStatus.PUBLISHED);
+            p.setSeller(seller);
+            p.setWeight(BigDecimal.valueOf(2.5));
+            Product savedP = productRepositoryPort.save(p);
             log.info("Producto de ejemplo creado: PROD-001 (Laptop Gamer Pro 16GB)");
+            return (PhysicalProduct) savedP;
+        });
+
+        Inventory invQuery = new Inventory();
+        invQuery.setProduct(product);
+        invQuery.setWarehouse(warehouse);
+        if (inventoryRepositoryPort.findByProductAndWarehouse(invQuery).isEmpty()) {
+            Inventory inv = new Inventory();
+            inv.setProduct(product);
+            inv.setWarehouse(warehouse);
+            inv.setAvailableQuantity(10);
+            inv.setReservedQuantity(0);
+            inv.setConditionStatus(InventoryConditionStatus.OPTIMAL);
+            inventoryRepositoryPort.save(inv);
+            log.info("Inventario inicial creado: 10 unidades para PROD-001 en WAR-BOG-01");
         }
     }
 

@@ -21,4 +21,7 @@ public interface SellerPort {
     // Warehouses & Stock
     List<Warehouse> consultMyWarehouses(User user);
     List<Inventory> consultMyInventory(User user, Warehouse warehouse);
+
+    // Reports
+    java.util.Map<String, Object> generateSellerReport(User user);
 }
