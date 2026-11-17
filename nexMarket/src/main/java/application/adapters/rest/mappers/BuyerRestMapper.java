@@ -9,7 +9,11 @@ public class BuyerRestMapper {
     public static Buyer toDomain(RegisterBuyerRequestDTO dto) {
         if (dto == null) return null;
         Buyer buyer = new Buyer();
-        buyer.setIdentifier(dto.getIdentifier());
+        String identifier = dto.getIdentifier();
+        if (identifier == null || identifier.isBlank()) {
+            identifier = "BUY-" + java.util.UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+        }
+        buyer.setIdentifier(identifier);
         buyer.setFullName(dto.getName());
         buyer.setEmail(dto.getEmail());
         buyer.setPassword(dto.getPassword());
