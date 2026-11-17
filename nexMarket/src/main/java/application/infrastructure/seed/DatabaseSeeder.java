@@ -184,7 +184,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             w.setIdentifier("WAR-BOG-01");
             w.setName("Bodega Principal Fontibón");
             w.setAddress("Zona Franca Calle 13 #100-20, Bogotá");
-            w.setType(WarehouseType.MAIN);
+            w.setType(WarehouseType.MARKETPLACE);
             w.setStatus(WarehouseStatus.ACTIVE);
             w.setOwner(seller);
             Warehouse savedW = warehouseRepositoryPort.save(w);
@@ -217,7 +217,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             inv.setWarehouse(warehouse);
             inv.setAvailableQuantity(10);
             inv.setReservedQuantity(0);
-            inv.setConditionStatus(InventoryConditionStatus.OPTIMAL);
+            inv.setConditionStatus(InventoryConditionStatus.AVAILABLE);
             inventoryRepositoryPort.save(inv);
             log.info("Inventario inicial creado: 10 unidades para PROD-001 en WAR-BOG-01");
         }
