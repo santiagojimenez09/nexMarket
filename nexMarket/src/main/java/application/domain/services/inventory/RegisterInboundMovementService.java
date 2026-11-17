@@ -7,6 +7,7 @@ import application.domain.exceptions.DomainException;
 import application.domain.exceptions.EntityNotFoundException;
 import application.domain.ports.out.InventoryMovementRepositoryPort;
 import application.domain.ports.out.InventoryRepositoryPort;
+import application.domain.valueObjects.InventoryConditionStatus;
 import application.domain.valueObjects.InventoryMovementType;
 
 import java.time.LocalDateTime;
@@ -29,7 +30,15 @@ public class RegisterInboundMovementService {
         }
 
         Inventory existingInventory = inventoryRepositoryPort.findByProductAndWarehouse(inventory)
-                .orElseThrow(() -> new EntityNotFoundException("No existe registro de inventario para este producto en el almacén indicado."));
+                .orElseGet(() -> {
+                    Inventory newInv = new Inventory();
+                    newInv.setProduct(inventory.getProduct());
+                    newInv.setWarehouse(inventory.getWarehouse());
+                    newInv.setAvailableQuantity(0);
+                    newInv.setReservedQuantity(0);
+                    newInv.setConditionStatus(InventoryConditionStatus.AVAILABLE);
+                    return inventoryRepositoryPort.save(newInv);
+                });
 
         existingInventory.setAvailableQuantity(existingInventory.getAvailableQuantity() + quantity);
         inventoryRepositoryPort.update(existingInventory);
