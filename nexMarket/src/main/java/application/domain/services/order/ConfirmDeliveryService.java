@@ -23,8 +23,8 @@ public class ConfirmDeliveryService implements ConfirmDeliveryUseCase {
             throw new InvalidOrderStatusException("El pedido ya se encuentra en estado ENTREGADO y no puede ser modificado.");
         }
 
-        if (existingOrder.getOrderStatus() != OrderStatus.DISPATCHED) {
-            throw new InvalidOrderStatusException("Solo pedidos en estado DESPACHADO pueden pasar a ENTREGADO. Estado actual: " + existingOrder.getOrderStatus());
+        if (existingOrder.getOrderStatus() != OrderStatus.DISPATCHED && existingOrder.getOrderStatus() != OrderStatus.PAID) {
+            throw new InvalidOrderStatusException("Solo pedidos en estado DESPACHADO o PAGADO pueden pasar a ENTREGADO. Estado actual: " + existingOrder.getOrderStatus());
         }
 
         existingOrder.setOrderStatus(OrderStatus.DELIVERED);
